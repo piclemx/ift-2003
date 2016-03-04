@@ -1,7 +1,7 @@
-% Auteur: Clément Spies
+% Auteur: ClÃ©ment Spies
 % Date: 02/03/2016
 
-% Début de la partie : Initialisation de la partie %
+% DÃ©but de la partie : Initialisation de la partie %
 
 %pion(1,1,vide). pion(2,1,vide). pion(3,1,vide). pion(4,1,vide). pion(5,1,vide). pion(6,1,vide). pion(7,1,vide).
 %pion(1,2,vide). pion(2,2,vide). pion(3,2,vide). pion(4,2,vide). pion(5,2,vide). pion(6,2,vide). pion(7,2,vide).
@@ -16,12 +16,12 @@ joueur(min).
 
 case(X,Y) :- X > 0, X < 8, Y > 0, Y < 7.
 
+%pion(X,Y,J).
+
 plein(X) :- pion(X, 6, J), joueur(J).
 
-pion(X,Y,J) :- peut_jouer(X,Y) , joueur(J).
-
-peut_jouer(X,1) :- not(plein(X)) , case(X,1) , not(pion(X,1,_))
-peut_jouer(X,Y) :- not(plein(X)) , case(X,Y) , not(pion(X,Y,_)) , pion(X,Y,_).
+peut_jouer(X,1) :- not(plein(X)) , case(X,1) , not(pion(X,1,_)).
+peut_jouer(X,Y) :- not(plein(X)) , case(X,Y) , not(pion(X,Y,_)) , pion(X,Y-1,_).
 
 gagne(J) :- pion(X, Y, J), pion(X+1, Y, J), pion(X+2, Y, J), pion(X+3, Y, J) ;       % 4 en ligne
             pion(X, Y, J), pion(X, Y+1, J), pion(X, Y+2, J), pion(X, Y+3, J) ;       % 4 en colonne
