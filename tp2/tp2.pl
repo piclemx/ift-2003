@@ -19,7 +19,7 @@ case(X,Y) :- X > 0, X < 8, Y > 0, Y < 7.
 plein(X) :- pion(X,6,J), joueur(J).
 
 peut_jouer(X,1) :- not(plein(X)) , case(X,1) , not(pion(X,1,_)).
-peut_jouer(X,Y) :- not(plein(X)) , case(X,Y) , not(pion(X,Y,_)) , pion(X,Y-1,_).
+peut_jouer(X,Y) :- not(plein(X)) , case(X,Y) , not(pion(X,Y,_)) , Y2 is Y-1, pion(X,Y2,_).
 
 pion(1,1,min).
 pion(2,1,min).
