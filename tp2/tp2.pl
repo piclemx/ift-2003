@@ -21,7 +21,14 @@ peut_jouer(X,Y) :- case(X,Y) , not(pion(X,Y,_)) , Y2 is Y-1, pion(X,Y2,_).
 pion(1,1,min).
 pion(2,1,min).
 pion(3,1,min).
-pion(4,1,min).
+%pion(4,1,min).
+pion(1,2,min).
+pion(1,3,min).
+%pion(1,4,min).
+pion(2,2,min).
+pion(2,3,min).
+pion(3,2,min).
+pion(3,3,min).
 
 gagne(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), X4 is X+3, pion(X4,Y,J), joueur(J);                                                             % 4 en ligne
             pion(XA,YA,J) , YA2 is YA+1, pion(XA,YA2,J), YA3 is YA+2, pion(XA,YA3,J), YA4 is YA+3, pion(XA,YA4,J), joueur(J);                                               % 4 en colonne
@@ -35,9 +42,9 @@ fin_partie(J) :- gagne(J) ; plein(1),plein(2),plein(3),plein(4),plein(5),plein(6
 % HEURISTIQUE
 
 peut_gagner(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), joueur(J), X0 is X-1, X4 is X+3, (peut_jouer(X0,Y) ; peut_jouer(X4,Y)) ;                                                                             % 3 en ligne
-                  pion(XA,YA,J) , YA2 is YA+1, pion(XA,YA2,J), YA3 is YA+2, pion(XA,YA3,J), joueur(J), YA0 is YA-1, YA4 is YA+3, (peut_jouer(XA,YA0) ; peut_jouer(XA,YA4));                                                            % 3 en colonne
-                  pion(XB,YB,J) , YB2 is YB+1, XB2 is XB+1, pion(XB2,YB2,J) , YB3 is YB+2, XB3 is XB+2, pion(XB3,YB3,J), joueur(J), XB0 is XB-1, XB4 is XB+3, YB0 is YB-1, YB4 is YB+3, (peut_jouer(XB0,YB0) ; peut_jouer(XB4,YB4));   % 3 en diagonale
-                  pion(XC,YC,J) , YC2 is YC-1, XC2 is XC+1, pion(XC2,YC2,J) , YC3 is YC-2, XC3 is XC+2, pion(XC3,YC3,J), joueur(J), XC0 is XC-1, XC4 is XC+3, YC0 is YC+1, YC4 is YC-3, (peut_jouer(XC0,YC0) ; peut_jouer(XC4,YC4)).   % 3 en diagonale
+                  pion(X,Y,J) , Y2 is Y+1, pion(X,Y2,J), Y3 is Y+2, pion(X,Y3,J), joueur(J), Y0 is Y-1, Y4 is Y+3, (peut_jouer(X,Y0) ; peut_jouer(X,Y4));                                                            % 3 en colonne
+                  pion(X,Y,J) , Y2 is Y+1, X2 is X+1, pion(X2,Y2,J) , Y3 is Y+2, X3 is X+2, pion(X3,Y3,J), joueur(J), X0 is X-1, X4 is X+3, Y0 is Y-1, Y4 is Y+3, (peut_jouer(X0,Y0) ; peut_jouer(X4,Y4));   % 3 en diagonale
+                  pion(X,Y,J) , Y2 is Y-1, X2 is X+1, pion(X2,Y2,J) , Y3 is Y-2, X3 is X+2, pion(X3,Y3,J), joueur(J), X0 is X-1, X4 is X+3, Y0 is Y+1, Y4 is Y-3, (peut_jouer(X0,Y0) ; peut_jouer(X4,Y4)).   % 3 en diagonale
 
 
 
