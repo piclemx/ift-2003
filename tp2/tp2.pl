@@ -22,13 +22,13 @@ pion(1,1,min).
 pion(2,1,min).
 pion(3,1,min).
 %pion(4,1,min).
-pion(1,2,min).
-pion(1,3,min).
-%pion(1,4,min).
-pion(2,2,min).
-pion(2,3,min).
-pion(3,2,min).
-pion(3,3,min).
+pion(1,2,max).
+pion(1,3,max).
+pion(1,4,max).
+%pion(2,2,min).
+%pion(2,3,min).
+%pion(3,2,min).
+%pion(3,3,min).
 
 gagne(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), X4 is X+3, pion(X4,Y,J), joueur(J);                                                             % 4 en ligne
             pion(XA,YA,J) , YA2 is YA+1, pion(XA,YA2,J), YA3 is YA+2, pion(XA,YA3,J), YA4 is YA+3, pion(XA,YA4,J), joueur(J);                                               % 4 en colonne
