@@ -23,4 +23,11 @@ gagne(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), X4 i
 
 fin_partie(J) :- gagne(J) ; plein(1),plein(2),plein(3),plein(4),plein(5),plein(6),plein(7).
 
+% HEURISTIQUE
+
+peut_gagner(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), joueur(J), X0 is X-1, X4 is X+3, (peut_jouer(X0,Y) ; peut_jouer(X4,Y)) ;                                                                             % 3 en ligne
+                  pion(XA,YA,J) , YA2 is YA+1, pion(XA,YA2,J), YA3 is YA+2, pion(XA,YA3,J), joueur(J), YA0 is YA-1, YA4 is YA+3, (peut_jouer(XA,YA0) ; peut_jouer(XA,YA4));                                                            % 3 en colonne
+                  pion(XB,YB,J) , YB2 is YB+1, XB2 is XB+1, pion(XB2,YB2,J) , YB3 is YB+2, XB3 is XB+2, pion(XB3,YB3,J), joueur(J), XB0 is XB-1, XB4 is XB+3, YB0 is YB-1, YB4 is YB+3, (peut_jouer(XB0,YB0) ; peut_jouer(XB4,YB4));   % 3 en diagonale
+                  pion(XC,YC,J) , YC2 is YC-1, XC2 is XC+1, pion(XC2,YC2,J) , YC3 is YC-2, XC3 is XC+2, pion(XC3,YC3,J), joueur(J), XC0 is XC-1, XC4 is XC+3, YC0 is YC+1, YC4 is YC-3, (peut_jouer(XC0,YC0) ; peut_jouer(XC4,YC4)).   % 3 en diagonale
+
 
