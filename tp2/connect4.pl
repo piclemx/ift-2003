@@ -257,6 +257,34 @@ computer_move(B,W2,W1,NewB,_,C2) :- calc_move(B,W2,W1,Pos), %handle usual case.
 
 draw(B) :- not(pos(_,B)),
            nl, nl, write('We seem to have tied.'), nl.
+		   
+%
+% winvert(Pos,B,W) := checks if move Pos in board B produces a win vertically
+%
+winvert(Pos,B,W) :- !,
+                    ith(Pos,B,Col),
+                    llength(Col,N),
+                    N >= 4,
+                    N1 is N-1,
+                    ith(N1,Col,W),
+                    N2 is N-2,
+                    ith(N2,Col,W),
+                    N3 is N-3,
+                    ith(N3,Col,W).
+
+%
+% winhorurdr(Pos,B,W) :=
+% check if there is a win horizontally, or up to the right, or up to the
+% left in board B at position Pos playing W.
+%
+
+winhorurdr(Pos,B,W) :- ith(Pos,B,Col),
+                   llength(Col,N),
+                   psum(1,1,0,N,B,W,0,Sumh), %compute horizontal sum
+                   psum(1,Pos,-1,N,B,W,0,Sumdr), %downright diagonal sum
+                   psum(1,Pos,1,N,B,W,0,Sumur), %upright diagonal sum
+                   !,
+                   (Sumh >= 4 ; Sumdr >= 4 ; Sumur >=4 ).
 
 %
 % win(Pos,B,PC,W,Cont) := if last move in board B was Pos playing piece W
@@ -268,7 +296,15 @@ draw(B) :- not(pos(_,B)),
 %                         otherwise Cont is cont so play continues.
 %
 
-%win(_,_,_,_,cont). % to be implemented (implemented in the bottom)
+% The following code checks for a win
+win(Pos,B,c,W,winc) :- winvert(Pos,B,W).
+win(Pos,B,c,W,winc) :- winhorurdr(Pos,B,W).
+
+win(Pos,B,p,W,winp) :- winvert(Pos,B,W).
+win(Pos,B,p,W,winp) :- winhorurdr(Pos,B,W).
+
+% if no win then continue
+win(_,_,_,_,cont).
 
 %
 % calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
@@ -325,42 +361,3 @@ psum(I,Pos,Sgn,N,B,W,PSum,Sum) :-
                                           ;PSum2 is PSum),             
                          J is I+1,
                          psum(J,Pos,Sgn,N,B,W,PSum2,Sum).
-
-%
-% winvert(Pos,B,W) := checks if move Pos in board B produces a win vertically
-%
-winvert(Pos,B,W) :- !,
-                    ith(Pos,B,Col),
-                    llength(Col,N),
-                    N >= 4,
-                    N1 is N-1,
-                    ith(N1,Col,W),
-                    N2 is N-2,
-                    ith(N2,Col,W),
-                    N3 is N-3,
-                    ith(N3,Col,W).
-
-%
-% winhorurdr(Pos,B,W) :=
-% check if there is a win horizontally, or up to the right, or up to the
-% left in board B at position Pos playing W.
-%
-
-winhorurdr(Pos,B,W) :- ith(Pos,B,Col),
-                   llength(Col,N),
-                   psum(1,1,0,N,B,W,0,Sumh), %compute horizontal sum
-                   psum(1,Pos,-1,N,B,W,0,Sumdr), %downright diagonal sum
-                   psum(1,Pos,1,N,B,W,0,Sumur), %upright diagonal sum
-                   !,
-                   (Sumh >= 4 ; Sumdr >= 4 ; Sumur >=4 ).
-
-
-% The following code checks for a win
-win(Pos,B,c,W,winc) :- winvert(Pos,B,W).
-win(Pos,B,c,W,winc) :- winhorurdr(Pos,B,W).
-
-win(Pos,B,p,W,winp) :- winvert(Pos,B,W).
-win(Pos,B,p,W,winp) :- winhorurdr(Pos,B,W).
-
-% if no win then continue
-win(_,_,_,_,cont).
