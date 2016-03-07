@@ -268,7 +268,7 @@ draw(B) :- not(pos(_,B)),
 %                         otherwise Cont is cont so play continues.
 %
 
-%win(_,_,_,_,cont). % to be implemented
+%win(_,_,_,_,cont). % to be implemented (implemented in the bottom)
 
 %
 % calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
