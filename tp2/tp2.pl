@@ -45,5 +45,25 @@ peut_gagner(A,B,J) :-
                   pion(X,Y,J) , Y2 is Y+1, X2 is X+1, pion(X2,Y2,J) , Y3 is Y+2, X3 is X+2, pion(X3,Y3,J), joueur(J), ((A is X-1, B is Y-1, peut_jouer(A,B)) ; (A is X+3, B is Y+3, peut_jouer(A,B)));
                   pion(X,Y,J) , Y2 is Y-1, X2 is X+1, pion(X2,Y2,J) , Y3 is Y-2, X3 is X+2, pion(X3,Y3,J), joueur(J), ((A is X-1, B is Y+1, peut_jouer(A,B)) ;  (A is X+3, B is Y-3, peut_jouer(A,B))).
 
+afpion(X,Y) :- not(pion(X,Y,_)) , write(' ') ;
+               pion(X,Y,min) , write('o') ;
+               pion(X,Y,max) , write('x').
+
+afficherGrille():-
+        write(' 1   2   3   4   5   6   7'), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,6), write(' | '), afpion(2,6), write(' | '), afpion(3,6), write(' | '), afpion(4,6), write(' | '), afpion(5,6), write(' | '), afpion(6,6), write(' | '), afpion(7,6), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,5), write(' | '), afpion(2,5), write(' | '), afpion(3,5), write(' | '), afpion(4,5), write(' | '), afpion(5,5), write(' | '), afpion(6,5), write(' | '), afpion(7,5), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,4), write(' | '), afpion(2,4), write(' | '), afpion(3,4), write(' | '), afpion(4,4), write(' | '), afpion(5,4), write(' | '), afpion(6,4), write(' | '), afpion(7,4), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,3), write(' | '), afpion(2,3), write(' | '), afpion(3,3), write(' | '), afpion(4,3), write(' | '), afpion(5,3), write(' | '), afpion(6,3), write(' | '), afpion(7,3), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,2), write(' | '), afpion(2,2), write(' | '), afpion(3,2), write(' | '), afpion(4,2), write(' | '), afpion(5,2), write(' | '), afpion(6,2), write(' | '), afpion(7,2), nl,
+        write('---+---+---+---+---+---+---'), nl,
+        write(' '), afpion(1,1), write(' | '), afpion(2,1), write(' | '), afpion(3,1), write(' | '), afpion(4,1), write(' | '), afpion(5,1), write(' | '), afpion(6,1), write(' | '), afpion(7,1), nl,
+        write('---+---+---+---+---+---+---'), nl.
+
 
 
