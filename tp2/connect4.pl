@@ -75,7 +75,7 @@ deplacer(Position,Plateau,x,NouveauPlateau) :- ith(Position, Plateau, PositionCo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Fonction principale qui permet de jouer le jeu
-puissance4 :- afficher_question, selectionner_oui_ou_non(X), jouer(X), !, jouer_encore.
+puissance4 :- afficher_question, selectionner_oui_ou_non(X), jouer(X).
 
 % Affiche la question
 afficher_question :- write('Est-ce que vous voulez jouer en premier?'),nl.
@@ -83,7 +83,7 @@ afficher_question :- write('Est-ce que vous voulez jouer en premier?'),nl.
 % Permet de selection o ou n
 selectionner_oui_ou_non(X) :- repeat, afficher_reponse(X), (X=110; X=111).
 
-% Permet d'afficher les choix et de prendre la réponse
+% Permet d'afficher les choix et de prendre la reponse
 afficher_reponse(X) :- nl,write('Choisir (o/n).'),nl,get(X).
 
 % Permet de jouer une partie
@@ -100,7 +100,7 @@ init_jeu(110,Plateau,Joueur,Ordinateur) :- plateau_vide(PlateauInitiale),
 
 % Fait un tour dans une partie
 jeu_actif(Plateau,_,_,_) :- egal(Plateau).
-jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagné!'), nl.
+jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagne!'), nl.
 jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.   
 jeu_actif(Plateau,Joueur,Ordinateur,cont) :- deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont1),
 												deplacer_ordinateur(NouveauPlateau,Ordinateur,Joueur,NouveauNouveauPlateau,Cont1,Cont2),
@@ -143,14 +143,20 @@ obtenir_deplacement(Position) :- repeat,
                 Position is X-48.
 
 % Afficher le message pour obtenir le deplacement
-afficher_obtenir_deplacement(X) :- nl,write('Choisir 1-7.'),nl,
-									get(X).
+afficher_obtenir_deplacement(X) :- nl,write('Choisir 1-7.'),nl,get(X).
 
 % Permet de deplacer l'ordinateur
 deplacer_ordinateur(Plateau,_,_,Plateau,joueur_gagne,_).
-deplacer_ordinateur(Plateau,Ordinateur,Joueur,NouveauPlateau,_,Cont2) :- calc_move(Plateau,Ordinateur,Joueur,Position),
+deplacer_ordinateur(Plateau,Ordinateur,Joueur,NouveauPlateau,_,Cont2) :- calcul_deplacement(Plateau,Ordinateur,Joueur,Position),
 																			deplacer(Position,Plateau,Ordinateur,NouveauPlateau),
 																			gagne(Position,NouveauPlateau,ordinateur,Ordinateur,Cont2).
+
+% Calcule le deplacement de l'ordinateur
+calcul_deplacement(Plateau,_,_,Position) :- position(Position,Plateau).
+																			
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code de victoire
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Est-ce que le plateau est plein?
 egal(Plateau) :- not(position(_,Plateau)),
@@ -168,92 +174,38 @@ gagne_verticalement(Position,Plateau,W) :- !,
 											N3 is N-3,
 											ith(N3,Colonne,W).
 
-%
-% gagne_horizontalement_ou_diagonalement(Pos,B,W) :=
-% check if there is a win horizontally, or up to the right, or up to the
-% left in board B at position Pos playing W.
-%
+% Permet de veifier si il y a une victoire horizontalement ou diagonalement
+gagne_horizontalement_ou_diagonalement(Position,Plateau,W) :- ith(Position,Plateau,Colonne),
+																llength(Colonne,N),
+																somme(1,1,0,N,Plateau,W,0,SommeHorizontale),
+																somme(1,Position,-1,N,Plateau,W,0,SommeDiagonaleBas),
+																somme(1,Position,1,N,Plateau,W,0,SommeDiagonaleHaut),
+																!,
+																(SommeHorizontale >= 4 ; SommeDiagonaleBas >= 4 ; SommeDiagonaleHaut >=4 ).
+																
+% Valeur des positions dans le plateau
+valeur_position(X,Y,Plateau,_,M1,M2) :-ith(X,Plateau,Colonne),
+										llength(Colonne,N),
+										N <Y,
+										(M1 >=4 -> M2 is M1; M2 is 0).
+valeur_position(X,Y,Plateau,W,M1,M2) :- ith(X,Plateau,Colonne),
+										 ith(Y,Colonne,W),
+										 M2 is M1+1.
+valeur_position(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
+																
+% Somme du nombre de jeton
+somme(8,_,_,_,_,_,Somme,Somme).
+somme(I,Position,Pente,N,Plateau,W,Somme1,Somme) :- Z is I-Position,
+													 Y is Pente*Z+N,
+													 ((Y =<6, Y>0) -> valeur_position(I,Y,Plateau,W,Somme1,Somme2)
+																	  ;Somme2 is Somme1),             
+													 J is I+1,
+													 somme(J,Position,Pente,N,Plateau,W,Somme2,Somme).
 
-gagne_horizontalement_ou_diagonalement(Pos,B,W) :- ith(Pos,B,Col),
-                   llength(Col,N),
-                   psum(1,1,0,N,B,W,0,Sumh), %compute horizontal sum
-                   psum(1,Pos,-1,N,B,W,0,Sumdr), %downright diagonal sum
-                   psum(1,Pos,1,N,B,W,0,Sumur), %upright diagonal sum
-                   !,
-                   (Sumh >= 4 ; Sumdr >= 4 ; Sumur >=4 ).
-
-%
-% gagne(Pos,B,PC,W,Cont) := if last move in board B was Pos playing piece W
-%                         and B has a win and PC is p then Cont is winp
-%                         and the player won.
-%                         if last move in board B was Pos playing piece W
-%                         and B has a win and PC is c then Cont is winc
-%                         and the computer won.
-%                         otherwise Cont is cont so play continues.
-%
-
-% The following code checks for a win
-gagne(Pos,B,c,W,winc) :- gagne_verticalement(Pos,B,W).
-gagne(Pos,B,c,W,winc) :- gagne_horizontalement_ou_diagonalement(Pos,B,W).
-
-gagne(Pos,B,p,W,winp) :- gagne_verticalement(Pos,B,W).
-gagne(Pos,B,p,W,winp) :- gagne_horizontalement_ou_diagonalement(Pos,B,W).
-
-% if no win then continue
+% Trouve une victoire si il y en a une
+gagne(Position,Plateau,ordinateur,W,ordinateur_gagne) :- gagne_verticalement(Position,Plateau,W).
+gagne(Position,Plateau,ordinateur,W,ordinateur_gagne) :- gagne_horizontalement_ou_diagonalement(Position,Plateau,W).
+gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_verticalement(Position,Plateau,W).
+gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_horizontalement_ou_diagonalement(Position,Plateau,W).
 gagne(_,_,_,_,cont).
-
-%
-% calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
-%                        W2 and player is W1 calculates computers move.
-%
-
-calc_move(B,_,_,Pos) :- position(Pos,B). %to be implemented in detail using a
-			            % minimax algorithm with alpha-beta pruning.
-
-%
-% jouer_encore ask if play wants
-%
-
-jouer_encore :- nl, nl, write('Would you like to play again?'),nl
-              , selectionner_oui_ou_non(X),
-              !,
-              X=121, %if not ASCII for y fail
-              puissance4.
 			  
-%
-% Code to check for a win in a connect4 board.
-%
-
-%
-% valpos(X,Y,B,W,M1,M2) := M1 represents a sum so far. M2 represents sum
-%                          after checking position (X,Y). M2 is reset to 0
-%                          if (X,Y) is not on board or not of type W and
-%                          M1 is less than 4. Otherwise if it is of type W
-%                          M2:=M1+1. else if M1 >=4 then M2:=M1.
-%
-valpos(X,Y,B,_,M1,M2) :-ith(X,B,Col), 
-                        llength(Col,N),
-                        N <Y,
-                        (M1 >=4 -> M2 is M1; M2 is 0).
-
-valpos(X,Y,B,W,M1,M2) :- ith(X,B,Col),
-                         ith(Y,Col,W),
-                         M2 is M1+1.
-
-valpos(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
-
-%
-% psum(I,Pos,Sgn,B,W,PSum,Sum) :=
-% Sum along a line of slope Sgn through the point (Pos,N) in board B
-% where W's are being check for four in a row. PSum
-% is the accumulating value. Sum is the final value.
-%
-
-psum(8,_,_,_,_,_,Sum,Sum). 
-psum(I,Pos,Sgn,N,B,W,PSum,Sum) :-
-                         Z is I-Pos,
-                         Y is Sgn*Z+N,
-                         ((Y =<6, Y>0) -> valpos(I,Y,B,W,PSum,PSum2)
-                                          ;PSum2 is PSum),             
-                         J is I+1,
-                         psum(J,Pos,Sgn,N,B,W,PSum2,Sum).
