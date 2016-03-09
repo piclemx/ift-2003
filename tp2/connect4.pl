@@ -1,16 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                           %
-%  Connect4 Program         %
-%                           %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Puissance 4
+% La question a poser est : ?- puissance4.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%
-% To start a game enter the query |?- connect4.
-%
-
-%
-% Basic functions some prolog implementations already have 
-%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fonctions utilitaires
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % append(L1,L2,L3) := L3 is list L2 appended to list L1
 
@@ -48,62 +43,32 @@ llength(L,N) :- lenacc(L,0,N).
 lenacc([],A,A).
 lenacc([_|T],A,N) :- A1 is A+1, lenacc(T,A1,N).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                %
-% Now for connect 4 stuff        %
-%                                %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Predicats necessaires au jeu de puissance 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%
-% A connect 4 board consists of a list of 7 lists. Each of these
-% lists is at most 6 long and consists of x's and o's representing
-% player moves. The players take turns choosing which of the seven
-% lists they want to add their piece to the end of. If a player gets
-% four of his pieces in a row either vertically, horizontally,
-% diagonally he wins. Games continues until either all 42 spaces have been
-% filled or someone wins.
-%
+% Retourne un plateau vide. 
+plateauvide([[],[],[],[],[],[],[]]).
 
+% Garde la hauteur d'une colonne plus petite que 6
+hauteur(I,Plateau) :- ith(I,Plateau,Z), llength(Z,N), N<6.
 
-% eboard(X) := returns X an empty board. 
-%
-eboard([[],[],[],[],[],[],[]]).
+% La position dans le plateau peut etre mis a cette postion si sa hauteur est satisfaite
+position(1,Plateau) :- hauteur(1,Plateau).
+position(2,Plateau) :- hauteur(2,Plateau).
+position(3,Plateau) :- hauteur(3,Plateau).
+position(4,Plateau) :- hauteur(4,Plateau).
+position(5,Plateau) :- hauteur(5,Plateau).
+position(6,Plateau) :- hauteur(6,Plateau).
+position(7,Plateau) :- hauteur(7,Plateau).
 
-%
-% Valid moves
-%
-
-%height is used to keep the height of a column in a connect 4 board =<6
-
-height(I,Y) :- ith(I,Y,Z),
-               llength(Z,N),
-               N<6.
-
-% pos(I,Y) position I in board Y is good to put a piece if its height is <6
-
-pos(4,Y) :-  height(4,Y).
-pos(3,Y) :-  height(3,Y).
-pos(5,Y) :-  height(5,Y).
-pos(2,Y) :-  height(2,Y).
-pos(6,Y) :-  height(6,Y).
-pos(1,Y) :-  height(1,Y).
-pos(7,Y) :-  height(7,Y).
-
-%
-% The definition of a connect 4 move
-% move(Pos,B,WhoseMove,NewB) := Pos is position where new piece is played
-%                               B is current board,
-%                               WhoseMove holds whether it is an x or an o
-%                               NewB is board after move
-%
-
-move(Pos,B,o,NewB) :- ith(Pos, B, ColPosOfB),
-                          append(ColPosOfB, [o], NewCol),
-                          ithrep(Pos, NewCol, B, NewB).
-move(Pos,B,x,NewB) :- ith(Pos, B, ColPosOfB),
-                          append(ColPosOfB, [x], NewCol),
-                          ithrep(Pos, NewCol, B, NewB).
-
+% Les deplacements possibles de des jetons
+deplacer(Position,Plateau,o,NouveauPlateau) :- ith(Position, Plateau, PositionColonnePlateau),
+												append(PositionColonnePlateau, [o], NouvelleColonne),
+												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
+deplacer(Position,Plateau,x,NouveauPlateau) :- ith(Position, Plateau, PositionColonnePlateau),
+												append(PositionColonnePlateau, [x], NouvelleColonne),
+												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                %
@@ -160,11 +125,11 @@ play_game(X) :- init_game(X,B,W1,W2),
 %                        computer (W2) plays x's
 %
 
-init_game(121,B,W1,W2) :- eboard(B), %player moves first
+init_game(121,B,W1,W2) :- plateauvide(B), %player moves first
                           W1=x,
                           W2=o.
 
-init_game(110,B,W1,W2) :- eboard(PreB), %computer moves first
+init_game(110,B,W1,W2) :- plateauvide(PreB), %computer moves first
                           W1=o,
                           W2=x,
                           computer_move(PreB,W2,W1,B,cont,cont).
@@ -219,12 +184,12 @@ player_move(B,W1,NewB,Cont) :- pboard(B),
                           nl, write('Select a move'),nl,
                           repeat, %repeat until get valid move from player
                             getmove(Pos),
-                            (pos(Pos,B)-> true
+                            (position(Pos,B)-> true
                                         ; nl,
                                           write('Sorry that column is full'),
                                           nl, fail),
                           !,
-                          move(Pos,B,W1,NewB), %generate new board
+                          deplacer(Pos,B,W1,NewB), %generate new board
                           win(Pos,NewB,p,W1,Cont). %check if player won
 %
 % getmove := get a move of player. Is returned in Pos.
@@ -249,13 +214,13 @@ pgetmove(X) :- nl,write('Please choose a number 1-7 and hit <ret>.'),nl,
 computer_move(B,_,_,B,winp,_). % if player has already won do nothing.
 
 computer_move(B,W2,W1,NewB,_,C2) :- calc_move(B,W2,W1,Pos), %handle usual case.
-                                 move(Pos,B,W2,NewB),
+                                 deplacer(Pos,B,W2,NewB),
                                  win(Pos,NewB,c,W2,C2).
 %
 % draw(B) := is board B full and hence game a draw?
 %
 
-draw(B) :- not(pos(_,B)),
+draw(B) :- not(position(_,B)),
            nl, nl, write('We seem to have tied.'), nl.
 		   
 %
@@ -311,7 +276,7 @@ win(_,_,_,_,cont).
 %                        W2 and player is W1 calculates computers move.
 %
 
-calc_move(B,_,_,Pos) :- pos(Pos,B). %to be implemented in detail using a
+calc_move(B,_,_,Pos) :- position(Pos,B). %to be implemented in detail using a
 			            % minimax algorithm with alpha-beta pruning.
 
 %
