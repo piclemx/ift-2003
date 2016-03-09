@@ -102,7 +102,7 @@ init_jeu(110,Plateau,Joueur,Ordinateur) :- plateau_vide(PlateauInitiale),
 jeu_actif(Plateau,_,_,_) :- egal(Plateau).
 jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagné!'), nl.
 jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.   
-jeu_actif(Plateau,Joueur,Ordinateur,cont) :- player_move(Plateau,Joueur,NouveauPlateau,Cont1),
+jeu_actif(Plateau,Joueur,Ordinateur,cont) :- deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont1),
 												deplacer_ordinateur(NouveauPlateau,Ordinateur,Joueur,NouveauNouveauPlateau,Cont1,Cont2),
 												jeu_actif(NouveauNouveauPlateau,Joueur,Ordinateur,Cont2).
 
@@ -122,35 +122,34 @@ afficher_ligne(Plateau,Ligne,Colonne) :- ith(Colonne,Plateau,Liste), ith(Ligne,L
                    NouvelleColonne is Colonne+1, afficher_ligne(Plateau,Ligne,NouvelleColonne).
 
 %
-% player_move(B,W1,NewB,Cont) :=  B contains board before player move
+% deplacer_joueur(B,W1,NewB,Cont) :=  B contains board before player move
 %                                 W1 has whether player is X or O
 %                                 NewB is board after move
 %                                 Cont is winp is player wins else cont
 
-player_move(B,W1,NewB,Cont) :- afficher_plateau(B),
-                          nl, write('Select a move'),nl,
-                          repeat, %repeat until get valid move from player
-                            getmove(Pos),
-                            (position(Pos,B)-> true
-                                        ; nl,
-                                          write('Sorry that column is full'),
-                                          nl, fail),
-                          !,
-                          deplacer(Pos,B,W1,NewB), %generate new board
-                          win(Pos,NewB,p,W1,Cont). %check if player won
-%
-% getmove := get a move of player. Is returned in Pos.
-%
+deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont) :- afficher_plateau(Plateau),
+														  nl, write('Choisir un deplacement'),nl,
+														  repeat,
+															obtenir_deplacement(Position),
+															(position(Position,Plateau)-> true
+																		; nl,
+																		  write('Cette colonne est pleine'),
+																		  nl, fail),
+														  !,
+														  deplacer(Position,Plateau,Joueur,NouveauPlateau),
+														  win(Position,NouveauPlateau,joueur,Joueur,Cont).
 
-getmove(Pos) :- repeat,   
-                  pgetmove(X),
-                  X>=49,  %ASCII for 1
-                  X=<55,  %ASCII for 7
+% Obtenir le deplacement
+obtenir_deplacement(Position) :- repeat,   
+                  afficher_obtenir_deplacement(X),
+                  X>=49,
+                  X=<55,
                 !,
-                Pos is X-48.
+                Position is X-48.
 
-pgetmove(X) :- nl,write('Please choose a number 1-7 and hit <ret>.'),nl,
-                 get(X).
+% Afficher le message pour obtenir le deplacement
+afficher_obtenir_deplacement(X) :- nl,write('Choisir 1-7.'),nl,
+									get(X).
 %
 % deplacer_ordinateur(B,W2,NewB,C1,C2) := B contains board before computer move
 %                                  W2 has whether computer is X or O
