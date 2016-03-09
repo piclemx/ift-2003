@@ -31,7 +31,9 @@ gagne(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), X4 i
             pion(X,Y,J) , Y2 is Y-1, X2 is X+1, pion(X2,Y2,J) , Y3 is Y-2, X3 is X+2, pion(X3,Y3,J) , Y4 is Y-3, X4 is X+3, pion(X4,Y4,J), joueur(J).   % 4 en diagonale
 
 
-fin_partie(J) :- gagne(J) ; plein(1),plein(2),plein(3),plein(4),plein(5),plein(6),plein(7).
+fin_partie(min) :- gagne(min) , write('Le joueur MIN a gagné.').
+fin_partie(max) :- gagne(max) , write('Le joueur MAX a gagné.').
+fin_partie(_) :- plein(1),plein(2),plein(3),plein(4),plein(5),plein(6),plein(7) , write('Partie nulle.').
 
 
 % HEURISTIQUE
