@@ -18,12 +18,15 @@ plein(X) :- pion(X,6,_).
 peut_jouer(X,1) :- case(X,1) , not(pion(X,1,_)).
 peut_jouer(X,Y) :- case(X,Y) , not(pion(X,Y,_)) , Y2 is Y-1, pion(X,Y2,_).
 
-pion(1,1,min).
-pion(2,1,min).
-pion(3,1,min).
-pion(1,2,max).
-pion(1,3,max).
-pion(1,4,max).
+
+
+%pion(X,Y,max):- (X>0,X<8);(Y>0,Y<7).
+pion(0,0,bob). %Initialisation des pions
+%pion(2,1,min).
+%pion(3,1,min).
+%pion(1,2,max).
+%pion(1,3,max).
+%pion(1,4,max).
 
 gagne(J) :- pion(X,Y,J) , X2 is X+1, pion(X2,Y,J), X3 is X+2, pion(X3,Y,J), X4 is X+3, pion(X4,Y,J), joueur(J);                                                             % 4 en ligne
             pion(X,Y,J) , Y2 is Y+1, pion(X,Y2,J), Y3 is Y+2, pion(X,Y3,J), Y4 is Y+3, pion(X,Y4,J), joueur(J);                                               % 4 en colonne
@@ -50,9 +53,24 @@ peut_gagner(A,B,J) :-
 
 % AFFICHER
 
-afpion(X,Y) :- not(pion(X,Y,_)) , write(' ') ;
-               pion(X,Y,min) , write('o') ;
-               pion(X,Y,max) , write('x').
+jouerX:- write('[x]Entrez un numero de colonne:'),nl,
+          read(X),  %%%% ,pion(X,1,max), cette foutu ligne bogue
+          afficherGrille(),
+          jouerO.
+        
+
+jouerO:- write('[o]Entrez un numero de colonne:'),nl,
+        read(X), %%%% ,pion(X,1,max), cette foutu ligne ne fonctionne pas
+        afficherGrille(),
+        jouerX.
+
+jouer:- write('Les x commence:'),nl,
+          afficherGrille(),
+          jouerX.
+
+afpion(X,Y) :-not(pion(X,Y,_)) , write(' ');
+              pion(X,Y,max) , write('x');
+              pion(X,Y,min) , write('o').
 
 afficherGrille():-
         write(' 1   2   3   4   5   6   7'), nl,
