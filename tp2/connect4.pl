@@ -28,7 +28,7 @@ ithtail(I,[_|W],L2) :- J is I-1, ithtail(J,W,L2).
 
 ithhead(I,L,L2) :- ithtail(I,L,L3), append(L2,L3,L).
 
-% ithrep(I,ELT,L1,L2) := L2 is the list obtained by replacing the 
+% ithrep(I,ELT,L1,L2) := L2 is the list obtained by replacing the
 %                        Ith element of list L1 with ELT.
 
 ithrep(I,ELT,L1,L2) :- J is I-1,
@@ -47,7 +47,7 @@ lenacc([_|T],A,N) :- A1 is A+1, lenacc(T,A1,N).
 % Predicats necessaires au jeu de puissance 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Retourne un plateau vide. 
+% Retourne un plateau vide.
 plateau_vide([[],[],[],[],[],[],[]]).
 
 % Garde la hauteur d'une colonne plus petite que 6
@@ -100,17 +100,22 @@ init_jeu(110,Plateau,Joueur,Ordinateur) :- plateau_vide(PlateauInitiale),
 
 % Fait un tour dans une partie
 jeu_actif(Plateau,_,_,_) :- egal(Plateau).
+<<<<<<< Updated upstream
 jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagne!'), nl.
 jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.   
+=======
+jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagné!'), nl.
+jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.
+>>>>>>> Stashed changes
 jeu_actif(Plateau,Joueur,Ordinateur,cont) :- deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont1),
 												deplacer_ordinateur(NouveauPlateau,Ordinateur,Joueur,NouveauNouveauPlateau,Cont1,Cont2),
 												jeu_actif(NouveauNouveauPlateau,Joueur,Ordinateur,Cont2).
 
 % Affiche le plateau
 afficher_plateau(Plateau) :- afficher_plateau(Plateau,6).
-afficher_plateau(_,0) :- write('|---|---|---|---|---|---|---|'),nl,
+afficher_plateau(_,0) :- write('+---+---+---+---+---+---+---+'),nl,
 							write('  1   2   3   4   5   6   7  '), nl.
-afficher_plateau(Plateau,Ligne) :- write('|---|---|---|---|---|---|---|'),nl,
+afficher_plateau(Plateau,Ligne) :- write('+---+---+---+---+---+---+---+'),nl,
 									write('| '), afficher_ligne(Plateau,Ligne,1), write(' |'),nl,
 									NouvelleLigne is Ligne-1,
 									afficher_plateau(Plateau,NouvelleLigne).
@@ -135,7 +140,7 @@ deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont) :- afficher_plateau(Plateau)
 														  gagne(Position,NouveauPlateau,joueur,Joueur,Cont).
 
 % Obtenir le deplacement
-obtenir_deplacement(Position) :- repeat,   
+obtenir_deplacement(Position) :- repeat,
                   afficher_obtenir_deplacement(X),
                   X>=49,
                   X=<55,
@@ -161,7 +166,7 @@ calcul_deplacement(Plateau,_,_,Position) :- position(Position,Plateau).
 % Est-ce que le plateau est plein?
 egal(Plateau) :- not(position(_,Plateau)),
 					nl, nl, write('La partie est nulle!'), nl.
-		   
+
 % Permet de veifier si il y a une victoire verticallement
 gagne_verticalement(Position,Plateau,W) :- !,
 											ith(Position,Plateau,Colonne),
@@ -208,4 +213,63 @@ gagne(Position,Plateau,ordinateur,W,ordinateur_gagne) :- gagne_horizontalement_o
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_verticalement(Position,Plateau,W).
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_horizontalement_ou_diagonalement(Position,Plateau,W).
 gagne(_,_,_,_,cont).
+<<<<<<< Updated upstream
 			  
+=======
+
+%
+% calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
+%                        W2 and player is W1 calculates computers move.
+%
+
+calc_move(B,_,_,Pos) :- position(Pos,B). %to be implemented in detail using a
+			            % minimax algorithm with alpha-beta pruning.
+
+%
+% jouer_encore ask if play wants
+%
+
+jouer_encore :- nl, nl, write('Would you like to play again?'),nl
+              , selectionner_oui_ou_non(X),
+              !,
+              X=121, %if not ASCII for y fail
+              puissance4.
+
+%
+% Code to check for a win in a connect4 board.
+%
+
+%
+% valpos(X,Y,B,W,M1,M2) := M1 represents a sum so far. M2 represents sum
+%                          after checking position (X,Y). M2 is reset to 0
+%                          if (X,Y) is not on board or not of type W and
+%                          M1 is less than 4. Otherwise if it is of type W
+%                          M2:=M1+1. else if M1 >=4 then M2:=M1.
+%
+valpos(X,Y,B,_,M1,M2) :-ith(X,B,Col),
+                        llength(Col,N),
+                        N <Y,
+                        (M1 >=4 -> M2 is M1; M2 is 0).
+
+valpos(X,Y,B,W,M1,M2) :- ith(X,B,Col),
+                         ith(Y,Col,W),
+                         M2 is M1+1.
+
+valpos(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
+
+%
+% psum(I,Pos,Sgn,B,W,PSum,Sum) :=
+% Sum along a line of slope Sgn through the point (Pos,N) in board B
+% where W's are being check for four in a row. PSum
+% is the accumulating value. Sum is the final value.
+%
+
+psum(8,_,_,_,_,_,Sum,Sum).
+psum(I,Pos,Sgn,N,B,W,PSum,Sum) :-
+                         Z is I-Pos,
+                         Y is Sgn*Z+N,
+                         ((Y =<6, Y>0) -> valpos(I,Y,B,W,PSum,PSum2)
+                                          ;PSum2 is PSum),
+                         J is I+1,
+                         psum(J,Pos,Sgn,N,B,W,PSum2,Sum).
+>>>>>>> Stashed changes
