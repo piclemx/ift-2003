@@ -100,13 +100,8 @@ init_jeu(110,Plateau,Joueur,Ordinateur) :- plateau_vide(PlateauInitiale),
 
 % Fait un tour dans une partie
 jeu_actif(Plateau,_,_,_) :- egal(Plateau).
-<<<<<<< Updated upstream
 jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagne!'), nl.
-jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.   
-=======
-jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagné!'), nl.
 jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.
->>>>>>> Stashed changes
 jeu_actif(Plateau,Joueur,Ordinateur,cont) :- deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont1),
 												deplacer_ordinateur(NouveauPlateau,Ordinateur,Joueur,NouveauNouveauPlateau,Cont1,Cont2),
 												jeu_actif(NouveauNouveauPlateau,Joueur,Ordinateur,Cont2).
@@ -158,7 +153,7 @@ deplacer_ordinateur(Plateau,Ordinateur,Joueur,NouveauPlateau,_,Cont2) :- calcul_
 
 % Calcule le deplacement de l'ordinateur
 calcul_deplacement(Plateau,_,_,Position) :- position(Position,Plateau).
-																			
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Code de victoire
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -187,7 +182,7 @@ gagne_horizontalement_ou_diagonalement(Position,Plateau,W) :- ith(Position,Plate
 																somme(1,Position,1,N,Plateau,W,0,SommeDiagonaleHaut),
 																!,
 																(SommeHorizontale >= 4 ; SommeDiagonaleBas >= 4 ; SommeDiagonaleHaut >=4 ).
-																
+
 % Valeur des positions dans le plateau
 valeur_position(X,Y,Plateau,_,M1,M2) :-ith(X,Plateau,Colonne),
 										llength(Colonne,N),
@@ -197,13 +192,13 @@ valeur_position(X,Y,Plateau,W,M1,M2) :- ith(X,Plateau,Colonne),
 										 ith(Y,Colonne,W),
 										 M2 is M1+1.
 valeur_position(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
-																
+
 % Somme du nombre de jeton
 somme(8,_,_,_,_,_,Somme,Somme).
 somme(I,Position,Pente,N,Plateau,W,Somme1,Somme) :- Z is I-Position,
 													 Y is Pente*Z+N,
 													 ((Y =<6, Y>0) -> valeur_position(I,Y,Plateau,W,Somme1,Somme2)
-																	  ;Somme2 is Somme1),             
+																	  ;Somme2 is Somme1),
 													 J is I+1,
 													 somme(J,Position,Pente,N,Plateau,W,Somme2,Somme).
 
@@ -213,63 +208,3 @@ gagne(Position,Plateau,ordinateur,W,ordinateur_gagne) :- gagne_horizontalement_o
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_verticalement(Position,Plateau,W).
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_horizontalement_ou_diagonalement(Position,Plateau,W).
 gagne(_,_,_,_,cont).
-<<<<<<< Updated upstream
-			  
-=======
-
-%
-% calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
-%                        W2 and player is W1 calculates computers move.
-%
-
-calc_move(B,_,_,Pos) :- position(Pos,B). %to be implemented in detail using a
-			            % minimax algorithm with alpha-beta pruning.
-
-%
-% jouer_encore ask if play wants
-%
-
-jouer_encore :- nl, nl, write('Would you like to play again?'),nl
-              , selectionner_oui_ou_non(X),
-              !,
-              X=121, %if not ASCII for y fail
-              puissance4.
-
-%
-% Code to check for a win in a connect4 board.
-%
-
-%
-% valpos(X,Y,B,W,M1,M2) := M1 represents a sum so far. M2 represents sum
-%                          after checking position (X,Y). M2 is reset to 0
-%                          if (X,Y) is not on board or not of type W and
-%                          M1 is less than 4. Otherwise if it is of type W
-%                          M2:=M1+1. else if M1 >=4 then M2:=M1.
-%
-valpos(X,Y,B,_,M1,M2) :-ith(X,B,Col),
-                        llength(Col,N),
-                        N <Y,
-                        (M1 >=4 -> M2 is M1; M2 is 0).
-
-valpos(X,Y,B,W,M1,M2) :- ith(X,B,Col),
-                         ith(Y,Col,W),
-                         M2 is M1+1.
-
-valpos(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
-
-%
-% psum(I,Pos,Sgn,B,W,PSum,Sum) :=
-% Sum along a line of slope Sgn through the point (Pos,N) in board B
-% where W's are being check for four in a row. PSum
-% is the accumulating value. Sum is the final value.
-%
-
-psum(8,_,_,_,_,_,Sum,Sum).
-psum(I,Pos,Sgn,N,B,W,PSum,Sum) :-
-                         Z is I-Pos,
-                         Y is Sgn*Z+N,
-                         ((Y =<6, Y>0) -> valpos(I,Y,B,W,PSum,PSum2)
-                                          ;PSum2 is PSum),
-                         J is I+1,
-                         psum(J,Pos,Sgn,N,B,W,PSum2,Sum).
->>>>>>> Stashed changes
