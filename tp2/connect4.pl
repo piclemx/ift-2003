@@ -4,46 +4,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Fonctions utilitaires
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% append(L1,L2,L3) := L3 is list L2 appended to list L1
-
-append([],L,L).
-append([X|L1],L2,[X|L3]) :- append(L1,L2,L3).
-
-% ith(I,L,Z) := Z is the Ith element of list L
-%            := on L = emptylist returns a space (slightly fudged)
-
-ith(_,[],' ').
-ith(1,[Y|_],Z) :- Y=Z.
-ith(I,[_|W],Z) :- J is I-1, ith(J,W,Z).
-
-% ithtail(I,L,L2) := List L2 is the elts after the Ith element in L
-
-ithtail(0,L,L2):- L=L2.
-ithtail(I,[_|W],L2) :- J is I-1, ithtail(J,W,L2).
-
-% ithhead(I,L,L2) := List L2 is the first I elts of L
-
-ithhead(I,L,L2) :- ithtail(I,L,L3), append(L2,L3,L).
-
-% ithrep(I,ELT,L1,L2) := L2 is the list obtained by replacing the
-%                        Ith element of list L1 with ELT.
-
-ithrep(I,ELT,L1,L2) :- J is I-1,
-                       ithhead(J,L1,L3),
-                       append(L3,[ELT],L4),
-                       ithtail(I,L1,L5),
-                       append(L4,L5,L2).
-
-% llength(L,N) := N is length of list L
-
-llength(L,N) :- lenacc(L,0,N).
-lenacc([],A,A).
-lenacc([_|T],A,N) :- A1 is A+1, lenacc(T,A1,N).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Predicats necessaires au jeu de puissance 4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -51,7 +11,7 @@ lenacc([_|T],A,N) :- A1 is A+1, lenacc(T,A1,N).
 plateau_vide([[],[],[],[],[],[],[]]).
 
 % Garde la hauteur d'une colonne plus petite que 6
-hauteur(I,Plateau) :- ith(I,Plateau,Z), llength(Z,N), N<6.
+hauteur(I,Plateau) :- position_liste(I,Plateau,Z), longeur(Z,N), N<6.
 
 % La position dans le plateau peut etre mis a cette postion si sa hauteur est satisfaite
 position(1,Plateau) :- hauteur(1,Plateau).
@@ -63,12 +23,12 @@ position(6,Plateau) :- hauteur(6,Plateau).
 position(7,Plateau) :- hauteur(7,Plateau).
 
 % Les deplacements possibles des jetons
-deplacer(Position,Plateau,o,NouveauPlateau) :- ith(Position, Plateau, PositionColonnePlateau),
-												append(PositionColonnePlateau, [o], NouvelleColonne),
-												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
-deplacer(Position,Plateau,x,NouveauPlateau) :- ith(Position, Plateau, PositionColonnePlateau),
-												append(PositionColonnePlateau, [x], NouvelleColonne),
-												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
+deplacer(Position,Plateau,o,NouveauPlateau) :- position_liste(Position, Plateau, PositionColonnePlateau),
+												joindre(PositionColonnePlateau, [o], NouvelleColonne),
+												remplacer_element(Position, NouvelleColonne, Plateau, NouveauPlateau).
+deplacer(Position,Plateau,x,NouveauPlateau) :- position_liste(Position, Plateau, PositionColonnePlateau),
+												joindre(PositionColonnePlateau, [x], NouvelleColonne),
+												remplacer_element(Position, NouvelleColonne, Plateau, NouveauPlateau).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Puissance 4
@@ -116,8 +76,8 @@ afficher_plateau(Plateau,Ligne) :- write('+---+---+---+---+---+---+---+'),nl,
 									afficher_plateau(Plateau,NouvelleLigne).
 
 % Affiche une ligne
-afficher_ligne(Plateau,Ligne,7) :- ith(7,Plateau,Liste), ith(Ligne,Liste,Symbole), write(Symbole).
-afficher_ligne(Plateau,Ligne,Colonne) :- ith(Colonne,Plateau,Liste), ith(Ligne,Liste,Symbole),
+afficher_ligne(Plateau,Ligne,7) :- position_liste(7,Plateau,Liste), position_liste(Ligne,Liste,Symbole), write(Symbole).
+afficher_ligne(Plateau,Ligne,Colonne) :- position_liste(Colonne,Plateau,Liste), position_liste(Ligne,Liste,Symbole),
                    write(Symbole), write(' | '),
                    NouvelleColonne is Colonne+1, afficher_ligne(Plateau,Ligne,NouvelleColonne).
 
@@ -164,19 +124,19 @@ egal(Plateau) :- not(position(_,Plateau)),
 
 % Permet de veifier si il y a une victoire verticallement
 gagne_verticalement(Position,Plateau,W) :- !,
-											ith(Position,Plateau,Colonne),
-											llength(Colonne,N),
+											position_liste(Position,Plateau,Colonne),
+											longeur(Colonne,N),
 											N >= 4,
 											N1 is N-1,
-											ith(N1,Colonne,W),
+											position_liste(N1,Colonne,W),
 											N2 is N-2,
-											ith(N2,Colonne,W),
+											position_liste(N2,Colonne,W),
 											N3 is N-3,
-											ith(N3,Colonne,W).
+											position_liste(N3,Colonne,W).
 
 % Permet de veifier si il y a une victoire horizontalement ou diagonalement
-gagne_horizontalement_ou_diagonalement(Position,Plateau,W) :- ith(Position,Plateau,Colonne),
-																llength(Colonne,N),
+gagne_horizontalement_ou_diagonalement(Position,Plateau,W) :- position_liste(Position,Plateau,Colonne),
+																longeur(Colonne,N),
 																somme(1,1,0,N,Plateau,W,0,SommeHorizontale),
 																somme(1,Position,-1,N,Plateau,W,0,SommeDiagonaleBas),
 																somme(1,Position,1,N,Plateau,W,0,SommeDiagonaleHaut),
@@ -184,12 +144,12 @@ gagne_horizontalement_ou_diagonalement(Position,Plateau,W) :- ith(Position,Plate
 																(SommeHorizontale >= 4 ; SommeDiagonaleBas >= 4 ; SommeDiagonaleHaut >=4 ).
 
 % Valeur des positions dans le plateau
-valeur_position(X,Y,Plateau,_,M1,M2) :-ith(X,Plateau,Colonne),
-										llength(Colonne,N),
+valeur_position(X,Y,Plateau,_,M1,M2) :-position_liste(X,Plateau,Colonne),
+										longeur(Colonne,N),
 										N <Y,
 										(M1 >=4 -> M2 is M1; M2 is 0).
-valeur_position(X,Y,Plateau,W,M1,M2) :- ith(X,Plateau,Colonne),
-										 ith(Y,Colonne,W),
+valeur_position(X,Y,Plateau,W,M1,M2) :- position_liste(X,Plateau,Colonne),
+										 position_liste(Y,Colonne,W),
 										 M2 is M1+1.
 valeur_position(_,_,_,_,M1,M2) :- (M1 >=4 -> M2 is M1; M2 is 0).
 
@@ -208,3 +168,44 @@ gagne(Position,Plateau,ordinateur,W,ordinateur_gagne) :- gagne_horizontalement_o
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_verticalement(Position,Plateau,W).
 gagne(Position,Plateau,joueur,W,joueur_gagne) :- gagne_horizontalement_ou_diagonalement(Position,Plateau,W).
 gagne(_,_,_,_,cont).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fonctions utilitaires
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% joindre(L1,L2,L3) := Permet de joindre la liste 1 (L1) et liste 2 (L2)
+%                      dans la liste 3 (L3).
+
+joindre([],L,L).
+joindre([X|L1],L2,[X|L3]) :- joindre(L1,L2,L3).
+
+% position_liste(I,L,Z) := Z est l'élément de la liste L
+%            := on L est une liste vide retourne une espace vide.
+
+position_liste(_,[],' ').
+position_liste(1,[Y|_],Z) :- Y=Z.
+position_liste(I,[_|W],Z) :- J is I-1, position_liste(J,W,Z).
+
+% queue_liste(I,L,L2) := La liste L2 est la liste qui se retrouve après le I ième élément de L
+
+queue_liste(0,L,L2):- L=L2.
+queue_liste(I,[_|W],L2) :- J is I-1, queue_liste(J,W,L2).
+
+% tete_liste(I,L,L2) := List L2 is the first I elts of L
+
+tete_liste(I,L,L2) :- queue_liste(I,L,L3), joindre(L2,L3,L).
+
+% remplacer_element(I,E,L1,L2) := L2 est la liste obtenu en
+%                     remplaçant la valeur à la position I avec
+%                     la valeur E.
+remplacer_element(I,E,L1,L2) :- J is I-1,
+                       tete_liste(J,L1,L3),
+                       joindre(L3,[E],L4),
+                       queue_liste(I,L1,L5),
+                       joindre(L4,L5,L2).
+
+% longeur(L,N) := N is longueur de la liste L
+
+longeur([], 0).
+longeur([_|Q], N) :- longeur(Q, N1), N is N1 + 1.
