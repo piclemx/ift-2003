@@ -48,7 +48,7 @@ lenacc([_|T],A,N) :- A1 is A+1, lenacc(T,A1,N).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Retourne un plateau vide. 
-plateauvide([[],[],[],[],[],[],[]]).
+plateau_vide([[],[],[],[],[],[],[]]).
 
 % Garde la hauteur d'une colonne plus petite que 6
 hauteur(I,Plateau) :- ith(I,Plateau,Z), llength(Z,N), N<6.
@@ -62,7 +62,7 @@ position(5,Plateau) :- hauteur(5,Plateau).
 position(6,Plateau) :- hauteur(6,Plateau).
 position(7,Plateau) :- hauteur(7,Plateau).
 
-% Les deplacements possibles de des jetons
+% Les deplacements possibles des jetons
 deplacer(Position,Plateau,o,NouveauPlateau) :- ith(Position, Plateau, PositionColonnePlateau),
 												append(PositionColonnePlateau, [o], NouvelleColonne),
 												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
@@ -70,109 +70,56 @@ deplacer(Position,Plateau,x,NouveauPlateau) :- ith(Position, Plateau, PositionCo
 												append(PositionColonnePlateau, [x], NouvelleColonne),
 												ithrep(Position, NouvelleColonne, Plateau, NouveauPlateau).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                %
-% Connect 4 game                 %
-%                                %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Puissance 4
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%
-% connect4 := main loop of program. The query :?- connect4.
-% plays a game.
-%
+% Fonction principale qui permet de jouer le jeu
+puissance4 :- afficher_question, selectionner_oui_ou_non(X), jouer(X), !, jouer_encore.
 
-connect4 :- print_title,
-            selectyn(X),
-            play_game(X),
-            !,
-            play_again.
+% Affiche la question
+afficher_question :- write('Est-ce que vous voulez jouer en premier?'),nl.
 
+% Permet de selection o ou n
+selectionner_oui_ou_non(X) :- repeat, afficher_reponse(X), (X=110; X=111).
 
-%
-% Title
-%
+% Permet d'afficher les choix et de prendre la réponse
+afficher_reponse(X) :- nl,write('Choisir (o/n).'),nl,get(X).
 
-print_title :- write('****************************'),nl,
-               write('*                          *'),nl,
-               write('*   Welcome to Connect 4   *'),nl,
-               write('*                          *'),nl,
-               write('****************************'),nl,nl,
-               write('Would you like to move first?'),nl.
-%
-% selectyn(X) returns X a keyboard input value in ASCII for y or n 
-%             y or n was pressed followed by return.
-%
+% Permet de jouer une partie
+jouer(X) :- init_jeu(X,B,W1,W2), jeu_actif(B,W1,W2,cont).
 
-selectyn(X) :- repeat,
-                 printget(X),
-                 (X=110; X=121). %ASCII for n and y
+% Initialise le jeu
+init_jeu(111,Plateau,Joueur,Ordinateur) :- plateau_vide(Plateau),
+											Joueur=x,
+											Ordinateur=o.
+init_jeu(110,Plateau,Joueur,Ordinateur) :- plateau_vide(PlateauInitiale),
+											Joueur=o,
+											Ordinateur=x,
+											deplacer_ordinateur(PlateauInitiale,Ordinateur,Joueur,Plateau,cont,cont).
 
-printget(X) :-   nl,write('Please choose (y/n) and hit <ret>.'),nl,
-                 get(X).
-%
-% play_game(X) plays one game of connect 4 using X to determine who
-%              plays 1st
-%
+% Fait un tour dans une partie
+jeu_actif(Plateau,_,_,_) :- egal(Plateau).
+jeu_actif(Plateau,_,_,joueur_gagne) :- afficher_plateau(Plateau), nl, write('Vous avez gagné!'), nl.
+jeu_actif(Plateau,_,_,ordinateur_gagne) :-  afficher_plateau(Plateau),nl, write('Vous avez perdu!'), nl.   
+jeu_actif(Plateau,Joueur,Ordinateur,cont) :- player_move(Plateau,Joueur,NouveauPlateau,Cont1),
+												deplacer_ordinateur(NouveauPlateau,Ordinateur,Joueur,NouveauNouveauPlateau,Cont1,Cont2),
+												jeu_actif(NouveauNouveauPlateau,Joueur,Ordinateur,Cont2).
 
-play_game(X) :- init_game(X,B,W1,W2),
-                game_active(B,W1,W2,cont).
+% Affiche le plateau
+afficher_plateau(Plateau) :- afficher_plateau(Plateau,6).
+afficher_plateau(_,0) :- write('|---|---|---|---|---|---|---|'),nl,
+							write('  1   2   3   4   5   6   7  '), nl.
+afficher_plateau(Plateau,Ligne) :- write('|---|---|---|---|---|---|---|'),nl,
+									write('| '), afficher_ligne(Plateau,Ligne,1), write(' |'),nl,
+									NouvelleLigne is Ligne-1,
+									afficher_plateau(Plateau,NouvelleLigne).
 
-%
-% init_game(X,B,W1,W2):= if x=121 then initializes B to empty board and player
-%                        (W1) play x's and computer (W2) plays o's
-%                     := if x=110 then initializes board B to point after
-%                        computer's first move. Player (W1) play's o's and
-%                        computer (W2) plays x's
-%
-
-init_game(121,B,W1,W2) :- plateauvide(B), %player moves first
-                          W1=x,
-                          W2=o.
-
-init_game(110,B,W1,W2) :- plateauvide(PreB), %computer moves first
-                          W1=o,
-                          W2=x,
-                          computer_move(PreB,W2,W1,B,cont,cont).
-
-%
-% game_active(B,W1,W2) := process events for one round of a game
-%                         where current board is B and player is
-%                         playing W1 and computer is playing W2.
-%
-
-game_active(B,_,_,_) :- draw(B).  % handle draw
-
-game_active(B,_,_,winp) :- pboard(B),
-                           nl, write('You beat me :('), nl.
-                              %handle player win
-
-game_active(B,_,_,winc) :-  pboard(B),
-                            nl, write('You have been crushed.'), nl.
-                              %handle computer win    
-
-game_active(B,W1,W2,cont) :- player_move(B,W1,NewB,Cont1),
-                             computer_move(NewB,W2,W1,NewerB,Cont1,Cont2),
-                              game_active(NewerB,W1,W2,Cont2).
-                              %handle case where game continues
-%
-% pboard(B) := prints the connect4 board B.
-%              This code could be more bullet proof.
-%
-
-pboard(B) :- pboard(B,6).
-
-pboard(_,0) :- write('|---|---|---|---|---|---|---|'),nl,
-               write('  1   2   3   4   5   6   7  '), nl.
-
-pboard(B,Row) :- write('| '), prow(B,Row,1), write(' |'),nl,
-               NewR is Row-1,
-               pboard(B,NewR).
-
-prow(B,Row,7) :- ith(7,B,Lst), ith(Row,Lst,Symb), write(Symb).
-
-prow(B,Row,Col) :- ith(Col,B,Lst), ith(Row,Lst,Symb),
-                   write(Symb), write(' | '),
-                   NewC is Col+1, prow(B,Row,NewC).
+% Affiche une ligne
+afficher_ligne(Plateau,Ligne,7) :- ith(7,Plateau,Liste), ith(Ligne,Liste,Symbole), write(Symbole).
+afficher_ligne(Plateau,Ligne,Colonne) :- ith(Colonne,Plateau,Liste), ith(Ligne,Liste,Symbole),
+                   write(Symbole), write(' | '),
+                   NouvelleColonne is Colonne+1, afficher_ligne(Plateau,Ligne,NouvelleColonne).
 
 %
 % player_move(B,W1,NewB,Cont) :=  B contains board before player move
@@ -180,7 +127,7 @@ prow(B,Row,Col) :- ith(Col,B,Lst), ith(Row,Lst,Symb),
 %                                 NewB is board after move
 %                                 Cont is winp is player wins else cont
 
-player_move(B,W1,NewB,Cont) :- pboard(B),
+player_move(B,W1,NewB,Cont) :- afficher_plateau(B),
                           nl, write('Select a move'),nl,
                           repeat, %repeat until get valid move from player
                             getmove(Pos),
@@ -205,22 +152,22 @@ getmove(Pos) :- repeat,
 pgetmove(X) :- nl,write('Please choose a number 1-7 and hit <ret>.'),nl,
                  get(X).
 %
-% computer_move(B,W2,NewB,C1,C2) := B contains board before computer move
+% deplacer_ordinateur(B,W2,NewB,C1,C2) := B contains board before computer move
 %                                  W2 has whether computer is X or O
 %                                  NewB is board after move
 %                                  C1 is flag if player has already won
 %                                  C2 is winc if computer wins else cont
 
-computer_move(B,_,_,B,winp,_). % if player has already won do nothing.
+deplacer_ordinateur(B,_,_,B,winp,_). % if player has already won do nothing.
 
-computer_move(B,W2,W1,NewB,_,C2) :- calc_move(B,W2,W1,Pos), %handle usual case.
+deplacer_ordinateur(B,W2,W1,NewB,_,C2) :- calc_move(B,W2,W1,Pos), %handle usual case.
                                  deplacer(Pos,B,W2,NewB),
                                  win(Pos,NewB,c,W2,C2).
 %
-% draw(B) := is board B full and hence game a draw?
+% egal(B) := is board B full and hence game a draw?
 %
 
-draw(B) :- not(position(_,B)),
+egal(B) :- not(position(_,B)),
            nl, nl, write('We seem to have tied.'), nl.
 		   
 %
@@ -280,14 +227,14 @@ calc_move(B,_,_,Pos) :- position(Pos,B). %to be implemented in detail using a
 			            % minimax algorithm with alpha-beta pruning.
 
 %
-% play_again ask if play wants
+% jouer_encore ask if play wants
 %
 
-play_again :- nl, nl, write('Would you like to play again?'),nl
-              , selectyn(X),
+jouer_encore :- nl, nl, write('Would you like to play again?'),nl
+              , selectionner_oui_ou_non(X),
               !,
               X=121, %if not ASCII for y fail
-              connect4.
+              puissance4.
 			  
 %
 % Code to check for a win in a connect4 board.
