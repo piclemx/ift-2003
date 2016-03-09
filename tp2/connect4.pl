@@ -121,12 +121,7 @@ afficher_ligne(Plateau,Ligne,Colonne) :- ith(Colonne,Plateau,Liste), ith(Ligne,L
                    write(Symbole), write(' | '),
                    NouvelleColonne is Colonne+1, afficher_ligne(Plateau,Ligne,NouvelleColonne).
 
-%
-% deplacer_joueur(B,W1,NewB,Cont) :=  B contains board before player move
-%                                 W1 has whether player is X or O
-%                                 NewB is board after move
-%                                 Cont is winp is player wins else cont
-
+% Permet de deplacer le joueur
 deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont) :- afficher_plateau(Plateau),
 														  nl, write('Choisir un deplacement'),nl,
 														  repeat,
@@ -137,7 +132,7 @@ deplacer_joueur(Plateau,Joueur,NouveauPlateau,Cont) :- afficher_plateau(Plateau)
 																		  nl, fail),
 														  !,
 														  deplacer(Position,Plateau,Joueur,NouveauPlateau),
-														  win(Position,NouveauPlateau,joueur,Joueur,Cont).
+														  gagne(Position,NouveauPlateau,joueur,Joueur,Cont).
 
 % Obtenir le deplacement
 obtenir_deplacement(Position) :- repeat,   
@@ -150,46 +145,36 @@ obtenir_deplacement(Position) :- repeat,
 % Afficher le message pour obtenir le deplacement
 afficher_obtenir_deplacement(X) :- nl,write('Choisir 1-7.'),nl,
 									get(X).
-%
-% deplacer_ordinateur(B,W2,NewB,C1,C2) := B contains board before computer move
-%                                  W2 has whether computer is X or O
-%                                  NewB is board after move
-%                                  C1 is flag if player has already won
-%                                  C2 is winc if computer wins else cont
 
-deplacer_ordinateur(B,_,_,B,winp,_). % if player has already won do nothing.
+% Permet de deplacer l'ordinateur
+deplacer_ordinateur(Plateau,_,_,Plateau,joueur_gagne,_).
+deplacer_ordinateur(Plateau,Ordinateur,Joueur,NouveauPlateau,_,Cont2) :- calc_move(Plateau,Ordinateur,Joueur,Position),
+																			deplacer(Position,Plateau,Ordinateur,NouveauPlateau),
+																			gagne(Position,NouveauPlateau,ordinateur,Ordinateur,Cont2).
 
-deplacer_ordinateur(B,W2,W1,NewB,_,C2) :- calc_move(B,W2,W1,Pos), %handle usual case.
-                                 deplacer(Pos,B,W2,NewB),
-                                 win(Pos,NewB,c,W2,C2).
-%
-% egal(B) := is board B full and hence game a draw?
-%
-
-egal(B) :- not(position(_,B)),
-           nl, nl, write('We seem to have tied.'), nl.
+% Est-ce que le plateau est plein?
+egal(Plateau) :- not(position(_,Plateau)),
+					nl, nl, write('La partie est nulle!'), nl.
 		   
-%
-% winvert(Pos,B,W) := checks if move Pos in board B produces a win vertically
-%
-winvert(Pos,B,W) :- !,
-                    ith(Pos,B,Col),
-                    llength(Col,N),
-                    N >= 4,
-                    N1 is N-1,
-                    ith(N1,Col,W),
-                    N2 is N-2,
-                    ith(N2,Col,W),
-                    N3 is N-3,
-                    ith(N3,Col,W).
+% Permet de veifier si il y a une victoire verticallement
+gagne_verticalement(Position,Plateau,W) :- !,
+											ith(Position,Plateau,Colonne),
+											llength(Colonne,N),
+											N >= 4,
+											N1 is N-1,
+											ith(N1,Colonne,W),
+											N2 is N-2,
+											ith(N2,Colonne,W),
+											N3 is N-3,
+											ith(N3,Colonne,W).
 
 %
-% winhorurdr(Pos,B,W) :=
+% gagne_horizontalement_ou_diagonalement(Pos,B,W) :=
 % check if there is a win horizontally, or up to the right, or up to the
 % left in board B at position Pos playing W.
 %
 
-winhorurdr(Pos,B,W) :- ith(Pos,B,Col),
+gagne_horizontalement_ou_diagonalement(Pos,B,W) :- ith(Pos,B,Col),
                    llength(Col,N),
                    psum(1,1,0,N,B,W,0,Sumh), %compute horizontal sum
                    psum(1,Pos,-1,N,B,W,0,Sumdr), %downright diagonal sum
@@ -198,7 +183,7 @@ winhorurdr(Pos,B,W) :- ith(Pos,B,Col),
                    (Sumh >= 4 ; Sumdr >= 4 ; Sumur >=4 ).
 
 %
-% win(Pos,B,PC,W,Cont) := if last move in board B was Pos playing piece W
+% gagne(Pos,B,PC,W,Cont) := if last move in board B was Pos playing piece W
 %                         and B has a win and PC is p then Cont is winp
 %                         and the player won.
 %                         if last move in board B was Pos playing piece W
@@ -208,14 +193,14 @@ winhorurdr(Pos,B,W) :- ith(Pos,B,Col),
 %
 
 % The following code checks for a win
-win(Pos,B,c,W,winc) :- winvert(Pos,B,W).
-win(Pos,B,c,W,winc) :- winhorurdr(Pos,B,W).
+gagne(Pos,B,c,W,winc) :- gagne_verticalement(Pos,B,W).
+gagne(Pos,B,c,W,winc) :- gagne_horizontalement_ou_diagonalement(Pos,B,W).
 
-win(Pos,B,p,W,winp) :- winvert(Pos,B,W).
-win(Pos,B,p,W,winp) :- winhorurdr(Pos,B,W).
+gagne(Pos,B,p,W,winp) :- gagne_verticalement(Pos,B,W).
+gagne(Pos,B,p,W,winp) :- gagne_horizontalement_ou_diagonalement(Pos,B,W).
 
 % if no win then continue
-win(_,_,_,_,cont).
+gagne(_,_,_,_,cont).
 
 %
 % calc_move(B,W2,W1,Pos) := assuming B is current board and computer is
