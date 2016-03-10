@@ -13,7 +13,8 @@ plateau_vide([[],[],[],[],[],[],[]]).
 % Garde la hauteur d'une colonne plus petite que 6
 hauteur(I,Plateau) :- position_liste(I,Plateau,Z), longeur(Z,N), N<6.
 
-% La position dans le plateau peut etre mis a cette postion si sa hauteur est satisfaite
+% La position dans le plateau peut etre mis a cette
+% postion si sa hauteur est satisfaite
 position(1,Plateau) :- hauteur(1,Plateau).
 position(2,Plateau) :- hauteur(2,Plateau).
 position(3,Plateau) :- hauteur(3,Plateau).
@@ -156,14 +157,14 @@ gagne(_,_,_,cont).
 joindre([],L,L).
 joindre([X|L1],L2,[X|L3]) :- joindre(L1,L2,L3).
 
-% position_liste(I,L,Z) := Z est l'Ã©lÃ©ment de la liste L
+% position_liste(I,L,Z) := Z est l'élément de la liste L
 %            := on L est une liste vide retourne une espace vide.
 
 position_liste(_,[],' ').
 position_liste(1,[Y|_],Z) :- Y=Z.
 position_liste(I,[_|W],Z) :- J is I-1, position_liste(J,W,Z).
 
-% queue_liste(I,L,L2) := La liste L2 est la liste qui se retrouve aprÃ¨s le I iÃ¨me Ã©lÃ©ment de L
+% queue_liste(I,L,L2) := La liste L2 est la liste qui se retrouve après le I ième élément de L
 
 queue_liste(0,L,L2):- L=L2.
 queue_liste(I,[_|W],L2) :- J is I-1, queue_liste(J,W,L2).
@@ -173,7 +174,7 @@ queue_liste(I,[_|W],L2) :- J is I-1, queue_liste(J,W,L2).
 tete_liste(I,L,L2) :- queue_liste(I,L,L3), joindre(L2,L3,L).
 
 % remplacer_element(I,E,L1,L2) := L2 est la liste obtenu en
-%                     remplaÃ§ant la valeur Ã  la position I avec
+%                     remplaçant la valeur à la position I avec
 %                     la valeur E.
 remplacer_element(I,E,L1,L2) :- J is I-1,
                        tete_liste(J,L1,L3),
