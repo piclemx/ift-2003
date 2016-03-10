@@ -171,7 +171,7 @@ gagne(_,_,_,_,cont).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Fonctions utilitaires
+% Predicats de service
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % joindre(L1,L2,L3) := Permet de joindre la liste 1 (L1) et liste 2 (L2)
