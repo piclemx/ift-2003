@@ -24,3 +24,19 @@ ch_avant:- write(' La BC est saturée'), nl.
 condition_vraie(C):- fait(C).
 condition_vraie(C1 et C2):- condition_vraie(C1), condition_vraie(C2).
 condition_vraie(C1 ou C2):- condition_vraie(C1) ; condition_vraie(C2).
+
+%voyage
+si distance(petite) alors deplacement(pied).
+si distance(moyenne) et possede_auto(vrai) alors deplacement(auto).
+si distance(moyenne) et possede_auto(faux) alors deplacement(train).
+si distance(grande) alors deplacement(avion).
+si distance(avion) alors billet(acheter).
+si billet(acheter) et possede_telephone(vrai) alors agence(telephoner).
+si billet(acheter) et possede_telephone(faux) alors agence(aller).
+si duree(longue) alors logement(vrai).
+si duree(courte) alors logement(faux).
+si logement(vrai) et voyageur(riche) alors reservation(hotel).
+si logement(vrai) et voyageur(pauvre) alors reservation(motel).
+si logement(faux) alors reservation(nulle).
+
+fait( distance(petite) ).
