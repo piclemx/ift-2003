@@ -38,5 +38,3 @@ si duree(courte) alors logement(faux).
 si logement(vrai) et voyageur(riche) alors reservation(hotel).
 si logement(vrai) et voyageur(pauvre) alors reservation(motel).
 si logement(faux) alors reservation(nulle).
-
-fait( distance(petite) ).
