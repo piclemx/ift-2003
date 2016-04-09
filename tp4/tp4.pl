@@ -2,7 +2,7 @@
 % et terminée par un point.
 % Resultat correspond à la liste des mots contenus dans la phrase.
 % Les signes de ponctuation ne sont pas gérés.
-lire(Chaine,Resultat):- write('Entrer votre question (avec des guillemets, en minuscule, sans ponctuation) : '), read(Chaine),
+lire(Chaine,Resultat):- write('Entrer votre question (entre apostrophes, en minuscule, sans ponctuation) : '), read(Chaine),
 	name(Chaine, Temp), chaine_liste(Temp, Resultat),!.
 	
 % Prédicat de transformation de chaîne en liste
