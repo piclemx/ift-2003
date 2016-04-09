@@ -23,28 +23,40 @@ lancer() :-
 
 % Base d'informations
 cout(québec, montréal, '50 $').
+trajet(québec, montréal, '16h00', '21h30').
 
 % Analyse sémantique
-question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM =.. [ACT, NOM1, NOM2] }.
+question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
+question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
+gn( AGNT ) --> art, adj, nc(AGNT).
 
 % Questions
 mq --> [combien].
+mq --> [quelle].
 
 v( cout ) --> [coûte].
+v( part ) --> [est].
 
 art --> [un].
+art --> [le].
 
 nc( trajet ) --> [trajet].
+nc( heure ) --> [heure].
 
 prep --> [entre].
+prep --> [à].
+prep --> [de].
+
+adj --> [prochain].
 
 ville( québec ) --> [québec].
 ville( montréal ) --> [montréal].
 
 conj --> [et].
 
-% Réponse aux questions                     
-reponse(QUESTION, REPONSE) :- call(QUESTION, X), !, REPONSE = X, write("La réponse est : "), write(X).
+% Réponse aux questions
+reponse([ACT, NOM1, NOM2, REPONSE], REPONSE) :- call(ACT, NOM1, NOM2, REPONSE), !, write('La réponse est : '), write(REPONSE).
+reponse([ACT, NOM1, NOM2, X, Y], REPONSE) :- call(ACT, NOM1, NOM2, X, Y), !, atom_concat(X, ' - ', Z), atom_concat(Z, Y, REPONSE), write('La réponse est : '), write(REPONSE).
