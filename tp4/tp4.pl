@@ -2,7 +2,7 @@
 % et terminée par un point.
 % Resultat correspond à la liste des mots contenus dans la phrase.
 % Les signes de ponctuation ne sont pas gérés.
-lire(Chaine,Resultat):- write('Entrer la phrase '), read(Chaine),
+lire(Chaine,Resultat):- write('Entrer votre question (avec des guillemets, en minuscule, sans ponctuation) : '), read(Chaine),
 	name(Chaine, Temp), chaine_liste(Temp, Resultat),!.
 	
 % Prédicat de transformation de chaîne en liste
@@ -15,44 +15,20 @@ separer([],_,[],[]):-!.
 separer([X|R],X,[],R):-!.
 separer([A|R],X,[A|Av],Ap):- X\==A, !, separer(R,X,Av,Ap).
 
+% Permet de lancer l'application
+lancer() :-
+	lire(_, Liste),
+	question(Q, Liste, []),
+	reponse(Q, _).
 
-
-
-
-
-
-
-% Base de connaissance
-cout(québec, montréal, 50).
-
-
-
-
-
-
-
-
-
+% Base d'informations
+cout(québec, montréal, '50 $').
 
 % Analyse sémantique
-question( SEM ) --> mq, gv(ACT, OBJ), prep, ville(NOM1), conj, ville(NOM2), { SEM =.. [ACT, NOM1, NOM2] }.
-mq( Q ) --> art, nc(AGNT).
+question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM =.. [ACT, NOM1, NOM2] }.
+mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 % Questions
 mq --> [combien].
@@ -70,19 +46,5 @@ ville( montréal ) --> [montréal].
 
 conj --> [et].
 
-
-
-
-
-
-
-
-
-
-
-
-
-reponse([],REPONSE):- REPONSE = "Je n'ai pas compris.".
-                     
-reponse(QUESTION, REPONSE) :- call(QUESTION, X), !, append("La réponse est :", X, REPONSE).
-
+% Réponse aux questions                     
+reponse(QUESTION, REPONSE) :- call(QUESTION, X), !, REPONSE = X, write("La réponse est : "), write(X).
