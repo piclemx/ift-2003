@@ -23,7 +23,11 @@ lancer() :-
 
 % Base d'informations
 cout(québec, montréal, '50 $').
+cout(québec, new-york, '200 $').
 trajet(québec, montréal, '16h00', '21h30').
+trajet(québec, new york, '0h00', '12h30').
+temps(québec, montréal, '5h30').
+temps(québec, new york, '12h30').
 arrets(québec, montréal, 0).
 arrets(québec, new-york, 2).
 
