@@ -24,13 +24,12 @@ lancer() :-
 % Base d'informations
 cout(québec, montréal, '50 $').
 trajet(québec, montréal, '16h00', '21h30').
-transport(québec, montréal, car).
+
 
 % Analyse sémantique
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 question( SEM ) --> mq, prep, nc(_), gv(ACT, _), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de temps dure un trajet entre Ville1 et Ville2 ?"
-question( SEM ) --> mq, gv(ACT, _), prep, nc(_), prep, v(_), prep, art, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Quel est le type de véhicule à utiliser pour un trajet entre Ville1 et Ville2 ?"
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
@@ -44,7 +43,6 @@ mq --> [quel].
 v( cout ) --> [coûte].
 v( part ) --> [est].
 v( dure ) --> [dure].
-v(utiliser) --> [utiliser]
 
 art --> [un].
 art --> [le].
@@ -52,13 +50,10 @@ art --> [le].
 nc( trajet ) --> [trajet].
 nc( heure ) --> [heure].
 nc( temps ) --> [temps].
-nc( type ) --> [type].
-nc( véhicule ) --> [véhicule].
 
 prep --> [entre].
 prep --> [à].
 prep --> [de].
-prep --> [pour]
 
 adj --> [prochain].
 
