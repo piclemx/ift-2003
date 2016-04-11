@@ -24,12 +24,14 @@ lancer() :-
 % Base d'informations
 cout(québec, montréal, '50 $').
 trajet(québec, montréal, '16h00', '21h30').
-
+arrets(québec, montréal, 0).
+arrets(québec, new-york, 2).
 
 % Analyse sémantique
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 question( SEM ) --> mq, prep, nc(_), gv(ACT, _), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de temps dure un trajet entre Ville1 et Ville2 ?"
+question( SEM ) --> mq, prep, nc(_), art, nc(_), v(_), prep, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de fois le chauffeur prendra de pauses ?"
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
@@ -43,6 +45,7 @@ mq --> [quel].
 v( cout ) --> [coûte].
 v( part ) --> [est].
 v( dure ) --> [dure].
+v( prendra ) --> [prendra].
 
 art --> [un].
 art --> [le].
@@ -50,6 +53,10 @@ art --> [le].
 nc( trajet ) --> [trajet].
 nc( heure ) --> [heure].
 nc( temps ) --> [temps].
+nc( fois ) --> [fois].
+nc( chauffeur ) --> [chauffeur].
+nc( pauses ) --> [pauses].
+
 
 prep --> [entre].
 prep --> [à].
@@ -59,6 +66,7 @@ adj --> [prochain].
 
 ville( québec ) --> [québec].
 ville( montréal ) --> [montréal].
+ville( new-york ) --> [new-york].
 
 conj --> [et].
 
