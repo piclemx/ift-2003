@@ -1,16 +1,16 @@
-% Le prédicat lire/2 lit une chaîne de caractères Chaine entre apostrophes
-% et terminée par un point.
-% Resultat correspond à la liste des mots contenus dans la phrase.
-% Les signes de ponctuation ne sont pas gérés.
+% Le prÃ©dicat lire/2 lit une chaÃ®ne de caractÃ¨res Chaine entre apostrophes
+% et terminÃ©e par un point.
+% Resultat correspond Ã  la liste des mots contenus dans la phrase.
+% Les signes de ponctuation ne sont pas gÃ©rÃ©s.
 lire(Chaine,Resultat):- write('Entrer votre question (entre apostrophes, en minuscule, sans ponctuation) : '), read(Chaine),
 	name(Chaine, Temp), chaine_liste(Temp, Resultat),!.
 	
-% Prédicat de transformation de chaîne en liste
+% PrÃ©dicat de transformation de chaÃ®ne en liste
 chaine_liste([],[]).
 chaine_liste(Liste,[Mot|Reste]):- separer(Liste,32,A,B), name(Mot,A),
 	chaine_liste(B,Reste).
 	
-% Sépare une liste par rapport à un élément
+% SÃ©pare une liste par rapport Ã  un Ã©lÃ©ment
 separer([],_,[],[]):-!.
 separer([X|R],X,[],R):-!.
 separer([A|R],X,[A|Av],Ap):- X\==A, !, separer(R,X,Av,Ap).
@@ -22,12 +22,15 @@ lancer() :-
 	reponse(Q, _).
 
 % Base d'informations
-cout(québec, montréal, '50 $').
-trajet(québec, montréal, '16h00', '21h30').
+cout(quÃ©bec, montrÃ©al, '50 $').
+trajet(quÃ©bec, montrÃ©al, '16h00', '21h30').
+transport(quÃ©bec, montrÃ©al, car).
 
-% Analyse sémantique
+% Analyse sÃ©mantique
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
+question( SEM ) --> mq, prep, nc(_), gv(ACT, _), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de temps dure un trajet entre Ville1 et Ville2 ?"
+question( SEM ) --> mq, gv(ACT, _), prep, nc(_), prep, v(_), prep, art, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Quel est le type de vÃ©hicule Ã  utiliser pour un trajet entre Ville1 et Ville2 ?"
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
@@ -36,27 +39,34 @@ gn( AGNT ) --> art, adj, nc(AGNT).
 % Questions
 mq --> [combien].
 mq --> [quelle].
+mq --> [quel].
 
-v( cout ) --> [coûte].
+v( cout ) --> [coÃ»te].
 v( part ) --> [est].
+v( dure ) --> [dure].
+v(utiliser) --> [utiliser]
 
 art --> [un].
 art --> [le].
 
 nc( trajet ) --> [trajet].
 nc( heure ) --> [heure].
+nc( temps ) --> [temps].
+nc( type ) --> [type].
+nc( vÃ©hicule ) --> [vÃ©hicule].
 
 prep --> [entre].
-prep --> [à].
+prep --> [Ã ].
 prep --> [de].
+prep --> [pour]
 
 adj --> [prochain].
 
-ville( québec ) --> [québec].
-ville( montréal ) --> [montréal].
+ville( quÃ©bec ) --> [quÃ©bec].
+ville( montrÃ©al ) --> [montrÃ©al].
 
 conj --> [et].
 
-% Réponse aux questions
-reponse([ACT, NOM1, NOM2, REPONSE], REPONSE) :- call(ACT, NOM1, NOM2, REPONSE), !, write('La réponse est : '), write(REPONSE).
-reponse([ACT, NOM1, NOM2, X, Y], REPONSE) :- call(ACT, NOM1, NOM2, X, Y), !, atom_concat(X, ' - ', Z), atom_concat(Z, Y, REPONSE), write('La réponse est : '), write(REPONSE).
+% RÃ©ponse aux questions
+reponse([ACT, NOM1, NOM2, REPONSE], REPONSE) :- call(ACT, NOM1, NOM2, REPONSE), !, write('La rÃ©ponse est : '), write(REPONSE).
+reponse([ACT, NOM1, NOM2, X, Y], REPONSE) :- call(ACT, NOM1, NOM2, X, Y), !, atom_concat(X, ' - ', Z), atom_concat(Z, Y, REPONSE), write('La rÃ©ponse est : '), write(REPONSE).
