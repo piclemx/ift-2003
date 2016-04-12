@@ -79,7 +79,7 @@ adj --> [prochain].
 
 ville( québec ) --> [québec].
 ville( montréal ) --> [montréal].
-ville( new-york ) --> [new-york].
+ville( newyork ) --> [newyork].
 
 conj --> [et].
 
