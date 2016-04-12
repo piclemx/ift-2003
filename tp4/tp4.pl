@@ -64,14 +64,12 @@ art --> [le].
 art --> [les].
 
 nc( trajet ) --> [trajet].
+nc( trajet ) --> [trajets].
 nc( heure ) --> [heure].
 nc( temps ) --> [temps].
 nc( fois ) --> [fois].
 nc( chauffeur ) --> [chauffeur].
 nc( pauses ) --> [pauses].
-nc( destinations ) --> [destinations].
-
-type(trajets,trajet).
 
 prep --> [entre].
 prep --> [à].
