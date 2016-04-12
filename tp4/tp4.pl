@@ -25,9 +25,9 @@ lancer() :-
 cout(québec, montréal, '50 $').
 cout(québec, new-york, '200 $').
 trajet(québec, montréal, '16h00', '21h30').
-trajet(québec, new york, '0h00', '12h30').
+trajet(québec, new-york, '0h00', '12h30').
 temps(québec, montréal, '5h30').
-temps(québec, new york, '12h30').
+temps(québec, new-york, '12h30').
 arrets(québec, montréal, 0).
 arrets(québec, new-york, 2).
 
@@ -35,7 +35,7 @@ arrets(québec, new-york, 2).
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 question( SEM ) --> mq, prep, nc(_), gv(ACT, _), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de temps dure un trajet entre Ville1 et Ville2 ?"
-question( SEM ) --> mq, prep, nc(_), art, nc(_), v(_), prep, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de fois le chauffeur prendra de pauses ?"
+%question( SEM ) --> mq, prep, nc(_), art, nc(_), v(_), prep, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de fois le chauffeur prendra de pauses ?"
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
