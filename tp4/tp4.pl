@@ -39,7 +39,7 @@ arrets(québec, newyork, 2).
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 question( SEM ) --> mq, prep, nc(ACT), gv(_, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
-question( SEM ) --> mq, v( sont ), gn(AGNT), v( partent ), prep, ville(NOM), { SEM = [AGNT, NOM]}.
+question( SEM ) --> mq, v( sont ), gn(AGNT), pro,v( partent ), prep, ville(NOM), { SEM = [AGNT, NOM]}.
 %question( SEM ) --> mq, prep, nc(_), art, nc(_), v(_), prep, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de fois le chauffeur prendra de pauses ?"
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
@@ -51,6 +51,8 @@ mq --> [combien].
 mq --> [quelle].
 mq --> [quel].
 mq --> [quelles].
+
+pro --> [qui].
 
 v( cout ) --> [coûte].
 v( part ) --> [est].
