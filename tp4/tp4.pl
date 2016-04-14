@@ -32,15 +32,15 @@ trajet(québec, newyork, '0h00', '12h30').
 trajet(québec, detroit, '19h00', '23h00').
 temps(québec, montréal, '5h30').
 temps(québec, newyork, '12h30').
-arrets(québec, montréal, 0).
-arrets(québec, newyork, 2).
+pauses(québec, montréal, 0).
+pauses(québec, newyork, 2).
 
 % Analyse sémantique
 question( SEM ) --> mq, gv(ACT, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }.
 question( SEM ) --> mq, prep, nc(ACT), gv(_, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> mq, v( sont ), gn(AGNT), pro,v( partent ), prep, ville(NOM), { SEM = [AGNT, NOM]}.
-%question( SEM ) --> mq, prep, nc(_), art, nc(_), v(_), prep, nc(_), prep, ville(NOM1), prep, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _, _] }. % "Combien de fois le chauffeur prendra de pauses ?"
+question( SEM ) --> mq, prep, nc(_), gn(_), v(_), prep, nc(ACT), prep, gn(_), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
@@ -76,6 +76,7 @@ nc( pauses ) --> [pauses].
 prep --> [entre].
 prep --> [à].
 prep --> [de].
+prep --> [pour].
 
 adj --> [prochain].
 
