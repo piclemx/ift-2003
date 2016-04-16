@@ -3,3 +3,5 @@ combien coûte un trajet entre québec et montréal
 combien de temps dure un trajet entre québec et montréal
 quelles sont les trajets qui partent de québec
 combien de fois le chauffeur prendra de pauses pour un trajet entre québec et montréal
+quelles sont les villes de départ qui mènent à montréal
+

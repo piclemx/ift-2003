@@ -29,7 +29,9 @@ cout(québec, montréal, '50 $').
 cout(québec, newyork, '200 $').
 trajet(québec, montréal, '16h00', '21h30').
 trajet(québec, newyork, '0h00', '12h30').
+trajet(detroit, newyork, '0h00', '12h30').
 trajet(québec, detroit, '19h00', '23h00').
+trajet(montréal, detroit, '12h00', '20h00').
 temps(québec, montréal, '5h30').
 temps(québec, newyork, '12h30').
 pauses(québec, montréal, 0).
@@ -41,6 +43,8 @@ question( SEM ) --> prep, mq, nc(_), gv(_, ACT), prep, ville(NOM1), prep, ville(
 question( SEM ) --> mq, prep, nc(ACT), gv(_, _), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
 question( SEM ) --> mq, v( sont ), gn(AGNT), pro,v( partent ), prep, ville(NOM), { SEM = [AGNT, NOM]}.
 question( SEM ) --> mq, prep, nc(_), gn(_), v(_), prep, nc(ACT), prep, gn(_), prep, ville(NOM1), conj, ville(NOM2), { SEM = [ACT, NOM1, NOM2, _] }.
+question( SEM ) --> mq, v( sont ), gn(_), prep, nc(AGNT), pro, v(_), prep, ville(DEST), { SEM = [AGNT, DEST]}.
+
 mq( _ ) --> art, nc(_).
 gv( ACT,OBJ ) --> v(ACT), gn(OBJ).
 gn( AGNT ) --> art, nc(AGNT).
@@ -60,6 +64,8 @@ v( dure ) --> [dure].
 v( prendra ) --> [prendra].
 v( sont ) --> [sont].
 v( partent ) --> [partent].
+v( mènent ) --> [mènent].
+
 
 art --> [un].
 art --> [le].
@@ -72,6 +78,8 @@ nc( temps ) --> [temps].
 nc( fois ) --> [fois].
 nc( chauffeur ) --> [chauffeur].
 nc( pauses ) --> [pauses].
+nc( trajet ) --> [départ].
+nc( villes ) --> [villes].
 
 prep --> [entre].
 prep --> [à].
@@ -83,10 +91,14 @@ adj --> [prochain].
 ville( québec ) --> [québec].
 ville( montréal ) --> [montréal].
 ville( newyork ) --> [newyork].
+ville( detroit ) --> [detroit].
+
+
 
 conj --> [et].
 
 % Réponse aux questions
 reponse([ACT, NOM1, NOM2, REPONSE], REPONSE) :- call(ACT, NOM1, NOM2, REPONSE), !, write('La réponse est : '), write(REPONSE).
 reponse([ACT, NOM1, NOM2, X, Y], REPONSE) :- call(ACT, NOM1, NOM2, X, Y), !, atom_concat(X, ' - ', Z), atom_concat(Z, Y, REPONSE), write('La réponse est : '), write(REPONSE).
-reponse([AGNT, NOM], REPONSE) :- findall(DEST,call(AGNT, NOM, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
+%reponse([AGNT, NOM], REPONSE) :- findall(DEST,call(AGNT, NOM, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
+reponse([AGNT, DEST], REPONSE) :- findall(DEP,call(AGNT, DEP, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
