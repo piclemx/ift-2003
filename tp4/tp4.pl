@@ -100,5 +100,5 @@ conj --> [et].
 % Réponse aux questions
 reponse([ACT, NOM1, NOM2, REPONSE], REPONSE) :- call(ACT, NOM1, NOM2, REPONSE), !, write('La réponse est : '), write(REPONSE).
 reponse([ACT, NOM1, NOM2, X, Y], REPONSE) :- call(ACT, NOM1, NOM2, X, Y), !, atom_concat(X, ' - ', Z), atom_concat(Z, Y, REPONSE), write('La réponse est : '), write(REPONSE).
-%reponse([AGNT, NOM], REPONSE) :- findall(DEST,call(AGNT, NOM, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
+reponse([AGNT, NOM], REPONSE) :- findall(DEST,call(AGNT, NOM, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
 reponse([AGNT, DEST], REPONSE) :- findall(DEP,call(AGNT, DEP, DEST , _, _),REPONSE), !, atomic_list_concat(REPONSE, ', ', REPONSE1) , write('La réponse est : '), write(REPONSE1).
